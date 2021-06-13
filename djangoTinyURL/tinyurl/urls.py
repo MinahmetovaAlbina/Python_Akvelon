@@ -5,7 +5,9 @@ from . import views
 app_name = 'tinyurl'
 urlpatterns = [
     # /tinyurl/
-    path('', views.index, name='index'),
+    path('', views.IndexView.as_view(), name='index'),
     # /tinyurl/4/
-    path('<int:myurl_id>/', views.detail, name='detail')
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+    # /tinyurl/create/
+    path('create/', views.CreateView.as_view(), name='create')
 ]

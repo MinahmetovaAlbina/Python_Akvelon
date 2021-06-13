@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Tiny Url</title>
 </head>
 <body>
+<a href="{% url 'tinyurl:create' %}">Create new tiny url</a>
 {% if most_frequently_used %}
     <ul>
     {% for myurl in most_frequently_used %}

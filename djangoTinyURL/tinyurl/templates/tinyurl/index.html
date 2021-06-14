@@ -17,7 +17,7 @@
             {% for myurl in most_frequently_used %}
                 <li><tr>
                     <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.original_url }}</a></td>
-                    <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.hash }}</a></td>
+                    <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
                     <td>{{ myurl.num_of_uses }}</td>
                 </tr></li>
             {% endfor %}

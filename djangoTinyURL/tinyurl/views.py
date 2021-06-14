@@ -17,8 +17,8 @@ class IndexView(generic.ListView):
 
 
 class DetailView(generic.DetailView):
-    model = MyUrl
     template_name = 'tinyurl/detail.html'
+    model = MyUrl
 
 
 def create(request):

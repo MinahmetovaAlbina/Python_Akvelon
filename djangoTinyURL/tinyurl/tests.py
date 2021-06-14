@@ -76,4 +76,4 @@ class DetailViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, tiny_url.original_url)
-        self.assertContains(response, tiny_url.hash)
+        self.assertContains(response, tiny_url.get_tiny_url())

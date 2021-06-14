@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from .models import MyUrl
 from .hash import get_hash
+from .views import IndexView
 
 
 class MyUrlTests(TestCase):
@@ -47,7 +48,7 @@ class HashTests(TestCase):
         self.assertNotEqual(get_hash(text1), get_hash(text2), 'hash from different string are equal')
 
 
-def create_tiny_url(original_url, num_of_uses=0):
+def create_my_url(original_url, num_of_uses=0):
     """
     Create a MyUrl with the given 'tiny_url_text' and 'num_of_uses'
     :param original_url: original url
@@ -73,7 +74,7 @@ class IndexViewTest(TestCase):
         """
         Tiny url are displayed on the index page.
         """
-        create_tiny_url(original_url='test_url')
+        create_my_url(original_url='test_url')
         response = self.client.get(reverse('tinyurl:index'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
@@ -85,13 +86,24 @@ class IndexViewTest(TestCase):
         """
         The index page may displayed multiple tiny urls.
         """
-        create_tiny_url(original_url='test_url_1', num_of_uses=1)
-        create_tiny_url(original_url='test_url_2', num_of_uses=10)
+        create_my_url(original_url='test_url_1', num_of_uses=1)
+        create_my_url(original_url='test_url_2', num_of_uses=10)
         response = self.client.get(reverse('tinyurl:index'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
             response.context['most_frequently_used'],
             ['<MyUrl: test_url_2>', '<MyUrl: test_url_1>']
+        )
+
+    def test_right_order_in_queryset(self):
+        create_my_url(original_url='test_url_1', num_of_uses=1)
+        create_my_url(original_url='test_url_2', num_of_uses=10)
+        create_my_url(original_url='test_url_3', num_of_uses=100)
+        response = self.client.get(reverse('tinyurl:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(
+            response.context['most_frequently_used'],
+            ['<MyUrl: test_url_3>', '<MyUrl: test_url_2>', '<MyUrl: test_url_1>']
         )
 
 
@@ -101,9 +113,31 @@ class DetailViewTests(TestCase):
         """
         the detail view of a exist tiny url displays the original url and the tiny url.
         """
-        tiny_url = create_tiny_url('test_url')
+        tiny_url = create_my_url('test_url')
         url = reverse('tinyurl:detail', args=(tiny_url.id, ))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, tiny_url.original_url)
         self.assertContains(response, tiny_url.get_tiny_url())
+
+
+class CreateViewTests(TestCase):
+
+    def test_create_page_are_allowed(self):
+        url = reverse('tinyurl:create')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
+class TinyUrlViewTest(TestCase):
+
+    def test_tiny_url_redirect_right(self):
+        """
+        tiny url redirects on original url
+        """
+        original_url = 'https://duckduckgo.com'
+        my_url = create_my_url(original_url)
+        url = reverse('tinyurl:tiny_url', args=(my_url.hash, ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, original_url, "the tiny url doesn't redirect to the original url")

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class MyUrl(models.Model):
@@ -10,3 +11,6 @@ class MyUrl(models.Model):
 
     def __str__(self):
         return self.tiny_url
+
+    def get_absolute_url(self):
+        return reverse('tinyurl:detail', kwargs={'pk': self.pk})

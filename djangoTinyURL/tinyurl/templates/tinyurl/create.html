@@ -6,11 +6,13 @@
 </head>
 <body>
     <p>You're in create page</p>
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
     <form action="{% url 'tinyurl:create'%}" method="post">
         {% csrf_token  %}
-        {{ form.as_p }}
-        <input type="submit" value="create" >
+        <label>input original url</label><br>
+        <input type="text" name="original_url"><br>
+        <input type="submit" value="Create">
     </form>
 </body>
 </html>

@@ -9,5 +9,5 @@ urlpatterns = [
     # /tinyurl/4/
     path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     # /tinyurl/create/
-    path('create/', views.CreateView.as_view(), name='create')
+    path('create/', views.create, name='create')
 ]

@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <title>Tiny Url</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tinyurl/my_stylesheet.css' %}">
 </head>
 <body>
-<a href="{% url 'tinyurl:create' %}">Create new tiny url</a>
-{% if most_frequently_used %}
-    <table>
-        <tr>
-            <th>original url</th>
-            <th>tiny url</th>
-            <th>number of uses</th>
-        </tr>
-        <ul>
-            {% for myurl in most_frequently_used %}
-                <li><tr>
-                    <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.original_url }}</a></td>
-                    <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
-                    <td>{{ myurl.num_of_uses }}</td>
-                </tr></li>
-            {% endfor %}
-        </ul>
-    </table>
-{% else %}
-    <p>No tiny url has been added.</p>
-{% endif %}
+    <header><a href="{% url 'tinyurl:index' %}"><h1>Tiny URL</h1></a>
+        <a href="{% url 'tinyurl:create' %}" class="button">Create new tiny url</a>
+    </header>
+    <div class="wholebody">
+        {% if most_frequently_used %}
+            <table border="1" class="main_table">
+                <tr>
+                    <th>original url</th>
+                    <th>tiny url</th>
+                    <th>number of uses</th>
+                </tr>
+                {% for myurl in most_frequently_used %}
+                    <tr>
+                        <td><div><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.original_url }}</a></div></td>
+                        <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
+                        <td><div class="p">{{ myurl.num_of_uses }}</div></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No tiny url has been added.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

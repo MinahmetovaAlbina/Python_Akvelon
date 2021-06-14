@@ -14,7 +14,7 @@ class IndexView(generic.ListView):
     context_object_name = 'most_frequently_used'
 
     def get_queryset(self):
-        return MyUrl.objects.order_by('-num_of_uses')[:20]
+        return MyUrl.objects.order_by('-num_of_uses')
 
 
 class DetailView(generic.DetailView):
@@ -27,13 +27,23 @@ def create(request):
         original_url = request.POST['original_url']
     except KeyError:
         return render(request, 'tinyurl/create.html', {
-            'error_message': "You didn't right an url"
-        })
+                'error_message': "Key error"
+            })
     else:
-        my_url = MyUrl.objects.create(original_url=original_url, hash=get_hash(original_url),
-                                      pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=0)
-        my_url.save()
-        return HttpResponseRedirect(reverse('tinyurl:detail', args=(my_url.id,)))
+        duplicate_url = MyUrl.objects.filter(original_url=original_url).first()
+        if duplicate_url is not None:
+            return render(request, 'tinyurl/create.html', {
+                'error_message': "I already made a tiny url for this one"
+            })
+        elif original_url is None or original_url is '':
+            return render(request, 'tinyurl/create.html', {
+                'error_message': "You didn't give me any url ;("
+            })
+        else:
+            my_url = MyUrl.objects.create(original_url=original_url, hash=get_hash(original_url),
+                                          pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=0)
+            my_url.save()
+            return HttpResponseRedirect(reverse('tinyurl:detail', args=(my_url.id,)))
 
 
 def tiny_url(request, my_hash):

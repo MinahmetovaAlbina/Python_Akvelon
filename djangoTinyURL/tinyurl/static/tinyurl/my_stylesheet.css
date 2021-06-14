@@ -1,0 +1,183 @@
+@font-face {
+    font-family: 'franklingothicbook'; /*a name to be used later*/
+    src: url(fonts/franklingothicbook.ttf); /*URL to font*/
+	}
+
+li a {
+    color: palegreen;
+}
+
+header {
+	position: fixed;
+	margin: 0 auto auto 0;		/* Отступ от верхнего, правого, нижнего, левого края */
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 50px;
+    padding-left:  10px;
+    background-color: #02136b;
+    background: url("images/AK66mYNrbk0-Header.png");
+    background-size: 100%;
+	}
+
+header h1 {
+	top: 0;
+	text-align: left;
+	color: #ffffad;				/* Цвет текста */
+    font-family: "franklingothicbook";
+	font: bold normal 18pt franklingothicbook; /* font: [font-style||font-variant||font-weight] font-size [/line-height] font-family | inherit */
+	}
+
+.wholebody {
+    position: absolute;
+    top: 55px;
+    bottom: 0px;
+    width: 100%;
+}
+
+body {
+    background: darkseagreen;
+    background: url("images/AK66mYNrbk0.jpg");
+    background-size:cover;
+    color: #1a0e09;
+    font-family: "franklingothicbook";
+    font-weight: bold;
+    /* text-shadow: 4px 2px 2px black, 0 0 0em black; /* Параметры тени */
+}
+
+a {
+    color: #1a0e09;
+}
+
+.button {
+    position: fixed;
+    top: 7px;
+    right: 10px;
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+
+    padding: 4px;
+
+    font-family: "franklingothicbook";
+	font: bold normal 18pt franklingothicbook;
+
+    background-color: #ffffe0;
+    border: 0px solid blue; 	/* Граница: толщина, стиль, цвет*/
+	border-radius: 4px 0px 4px 4px;  /* Радиус закругления краёв границы */
+}
+
+.button:hover {
+    color: white;
+    background-color: #6666ff;
+    transform: scale(1.01) rotate(0deg); /* Действие при наведении курсора */
+}
+
+.main_table {
+    position: center;
+    overflow: hidden;
+}
+
+.main_table th {
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 24pt;
+}
+
+.main_table td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 18pt;
+}
+
+.main_table td div {
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 500px;
+}
+
+.main_table td:hover {
+    transform: scale(1.05) rotate(0.1deg); /* Действие при наведении курсора */
+}
+
+.main_table td:last-child:hover {
+    transform: scale(1) rotate(0deg); /* Действие при наведении курсора */
+}
+
+.detail_table {
+    position: center;
+}
+
+.detail_table td {
+    min-width: 210px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 22pt;
+    vertical-align: top;
+}
+
+.detail_table td div {
+    color: #19ff19;
+    padding-right: 5px;
+}
+
+.p {
+    text-align: center;
+}
+
+label {
+    font-family: "franklingothicbook";
+	font: bold normal 28pt franklingothicbook;
+}
+
+.original_url_input {
+    min-width: 1000px;
+    font-size: 18pt;
+    font-style: italic;
+}
+
+.error_msg {
+    font-family: "franklingothicbook";
+	font: bold normal 28pt franklingothicbook;
+    color: #740000;
+}
+
+.create_button {
+    min-width: 140px;
+    min-height: 70px;
+    font: bold normal 37pt franklingothicbook;
+    background-color: #ffffe0;
+    border: 0px solid blue; 	/* Граница: толщина, стиль, цвет*/
+	border-radius: 0px 15px 14px 15px;  /* Радиус закругления краёв границы */
+}
+
+.create_button:hover {
+    color: white;
+    background-color: #3333ff;
+    /* transform: scale(1.1) rotate(1.77deg); /* Действие при наведении курсора */
+    -webkit-transform-origin: top left;
+    -moz-transform-origin: top left;
+    -o-transform-origin: top left;
+    transform-origin: top left;
+    animation-name: example;
+    animation-duration: 0.3s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes example {
+    25%  {transform:scale(1.025)
+        rotate(1.1925deg)}
+    50%  {transform:scale(1.05)
+        rotate(1.385deg)}
+    75%  {transform:scale(1.075)
+        rotate(1.5775deg)}
+    100% {transform:scale(1.1)
+        rotate(1.77deg)}
+}

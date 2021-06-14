@@ -3,9 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Tiny url: {{ myurl.id }}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tinyurl/my_stylesheet.css' %}">
 </head>
 <body>
-<p>original url: {{ myurl.original_url }}</p>
-<p>tiny url: {{ myurl.get_tiny_url }}</p>
+    <header><a href="{% url 'tinyurl:index' %}"><h1>Tiny URL</h1></a>
+        <a href="{% url 'tinyurl:create' %}" class="button">Create new tiny url</a>
+    </header>
+    <div class="wholebody">
+        <table border="0" class="detail_table">
+            <tr>
+                <td>original url:</td>
+                <td>{{ myurl.original_url }}</td>
+            </tr>
+            <tr>
+                <td>tiny url:</td>
+                <td><div>{{ myurl.get_tiny_url }}</div></td>
+            </tr>
+            <tr>
+                <td>number of uses:</td>
+                <td>{{ myurl.num_of_uses }}</td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>

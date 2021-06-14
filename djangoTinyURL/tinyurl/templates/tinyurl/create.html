@@ -3,16 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Create</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'tinyurl/my_stylesheet.css' %}">
 </head>
 <body>
-    <p>You're in create page</p>
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    <header><a href="{% url 'tinyurl:index' %}"><h1>Tiny URL</h1></a>
+        <a href="{% url 'tinyurl:create' %}" class="button">Create new tiny url</a>
+    </header>
+    <div class="wholebody">
+    {% if error_message %}<p><strong class="error_msg">{{ error_message }}</strong></p>{% endif %}
 
     <form action="{% url 'tinyurl:create'%}" method="post">
         {% csrf_token  %}
-        <label>input original url</label><br>
-        <input type="text" name="original_url"><br>
-        <input type="submit" value="Create">
+        <label>Please input your original url here:</label><br><br>
+        <input type="text" name="original_url" onkeydown="this.style.width = ((this.value.length + 0) * 8) + 'px';" class="original_url_input" placeholder="type down your url..."><br>
+        <div class="input-buffer"></div><br>
+        <input type="submit" value="Create" class="create_button">
     </form>
+    </div>
 </body>
 </html>

@@ -38,6 +38,6 @@ def create(request):
 def tiny_url(request, my_hash):
     my_url = MyUrl.objects.filter(hash=my_hash).first()
     if my_url is None:
-        return Http404
+        raise Http404("Page does not exist")
     else:
-        return HttpResponse('You are in the tiny url page of ' + my_url.original_url)
+        return HttpResponseRedirect(my_url.original_url)

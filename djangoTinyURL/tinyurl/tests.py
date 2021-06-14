@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import MyUrl
-from .hash import get_tiny_url
+from .hash import get_hash
 
 
 class MyUrlTests(TestCase):
@@ -13,7 +13,7 @@ class MyUrlTests(TestCase):
         MyUrl string is tiny url
         :return:
         """
-        my_url = MyUrl(tiny_url='text')
+        my_url = MyUrl(original_url='text')
         self.assertIs(f"{my_url}", my_url.original_url)
 
 
@@ -24,7 +24,7 @@ def create_tiny_url(original_url, num_of_uses=0):
     :param num_of_uses: the number of times the tiny url was used
     :return: created MyUrl
     """
-    return MyUrl.objects.create(original_url=original_url, tiny_url=get_tiny_url(original_url),
+    return MyUrl.objects.create(original_url=original_url, hash=get_hash(original_url),
                                 pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=num_of_uses)
 
 
@@ -76,4 +76,4 @@ class DetailViewTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, tiny_url.original_url)
-        self.assertContains(response, tiny_url.tiny_url)
+        self.assertContains(response, tiny_url.hash)

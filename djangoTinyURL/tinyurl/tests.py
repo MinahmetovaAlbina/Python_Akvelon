@@ -17,6 +17,36 @@ class MyUrlTests(TestCase):
         self.assertIs(f"{my_url}", my_url.original_url)
 
 
+class HashTests(TestCase):
+
+    def test_get_hash(self):
+        text = 'test'
+        self.assertEqual(get_hash(text), f"{text.__hash__()}")
+
+    def test_hash_from_one_strings_are_same(self):
+        """
+        hash from one string should be equal
+        """
+        text = 'test'
+        self.assertEqual(get_hash(text), get_hash(text), 'hash from one string are different')
+
+    def test_hash_from_equal_strings_are_equal(self):
+        """
+        hash from equal strings should be equal
+        """
+        text1 = 'test'
+        text2 = text1
+        self.assertEqual(get_hash(text1), get_hash(text2), 'hash from equal string are different')
+
+    def test_hash_from_different_strings_are_different(self):
+        """
+        hash from different strings should be different
+        """
+        text1 = 'test'
+        text2 = text1 + '4'
+        self.assertNotEqual(get_hash(text1), get_hash(text2), 'hash from different string are equal')
+
+
 def create_tiny_url(original_url, num_of_uses=0):
     """
     Create a MyUrl with the given 'tiny_url_text' and 'num_of_uses'

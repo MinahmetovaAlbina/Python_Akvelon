@@ -19,6 +19,3 @@ class MyUrl(models.Model):
 
     def get_tiny_url(self):
         return get_tiny_url_page_url() + self.hash
-
-
-

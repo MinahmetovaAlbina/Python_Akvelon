@@ -11,23 +11,31 @@
         <a href="{% url 'tinyurl:create' %}" class="button">Create new tiny url</a>
     </header>
     <div class="wholebody">
+    {% if error_message %}<p><strong class="error_msg">{{ error_message }}</strong></p>{% endif %}
+    {% if success_message %}<p><strong class="success_msg">{{ success_message }}</strong></p>{% endif %}
         {% if most_frequently_used %}
-            <table border="1" class="main_table">
-                <tr>
-                    <th>original url</th>
-                    <th>tiny url</th>
-                    <th>number of uses</th>
-                </tr>
-                {% for myurl in most_frequently_used %}
+            <form action="{% url 'tinyurl:delete' %}" method="post">
+                <table border="1" class="main_table">
                     <tr>
-                        <td><div><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.original_url }}</a></div></td>
-                        <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
-                        <td><div class="p">{{ myurl.num_of_uses }}</div></td>
+                        <th>Original url</th>
+                        <th>Tiny url</th>
+                        <th>Number of uses</th>
+                        {% csrf_token %}
+                        <th><input type="submit" value="Delete" class="delete_button"></th>
                     </tr>
-                {% endfor %}
-            </table>
+                    {% for myurl in most_frequently_used %}
+                        <tr>
+                            <td><div><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.original_url }}</a></div></td>
+                            <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
+                            <td><div class="p">{{ myurl.num_of_uses }}</div></td>
+                            {% csrf_token %}
+                            <td><div class="p"><input type="radio" name="deleted_my_url" id="{{ myurl.id }}" value="{{ myurl.id }}"></div></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </form>
         {% else %}
-            <p>No tiny url has been added.</p>
+            <p class="error_msg">No tiny url has been added.</p>
         {% endif %}
     </div>
 </body>

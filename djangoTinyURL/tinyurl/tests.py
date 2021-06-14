@@ -139,5 +139,5 @@ class TinyUrlViewTest(TestCase):
         my_url = create_my_url(original_url)
         url = reverse('tinyurl:tiny_url', args=(my_url.hash, ))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 301)
         self.assertEqual(response.url, original_url, "the tiny url doesn't redirect to the original url")

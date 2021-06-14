@@ -79,6 +79,7 @@ a {
 .main_table {
     position: center;
     overflow: hidden;
+    margin: auto; /* Таблица по центру (отступы: автоматически) */
 }
 
 .main_table th {
@@ -111,6 +112,7 @@ a {
 
 .detail_table {
     position: center;
+    margin: auto; /* Таблица по центру (отступы: автоматически) */
 }
 
 .detail_table td {
@@ -149,6 +151,12 @@ label {
     color: #740000;
 }
 
+.success_msg {
+    font-family: "franklingothicbook";
+	font: bold normal 28pt franklingothicbook;
+    color: #19ff19;
+}
+
 .create_button {
     min-width: 140px;
     min-height: 70px;
@@ -180,4 +188,23 @@ label {
         rotate(1.5775deg)}
     100% {transform:scale(1.1)
         rotate(1.77deg)}
+}
+
+.delete_button {
+    position: relative;
+    top: -4px;
+    font: bold normal 18pt franklingothicbook;
+    background-color: #ffffe0;
+    border: 0px solid blue; 	/* Граница: толщина, стиль, цвет*/
+	border-radius: 14px 15px 14px 0px;  /* Радиус закругления краёв границы */
+}
+
+.delete_button:hover {
+    color: white;
+    background-color: #6666ff;
+    transform: scale(1.05) rotate(0deg); /* Действие при наведении курсора */
+    -webkit-transform-origin: bottom;
+    -moz-transform-origin: bottom;
+    -o-transform-origin: bottom;
+    transform-origin: bottom;
 }

@@ -1,6 +1,6 @@
 from django.db.models import F
-from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import render
+from django.http import HttpResponseRedirect, Http404, HttpRequest, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views import generic
 from django.urls import reverse
@@ -9,13 +9,45 @@ from .models import MyUrl
 from .hash import get_hash
 
 
+def get_most_frequently_used():
+    return MyUrl.objects.order_by('-num_of_uses')
+
+
 class IndexView(generic.ListView):
     template_name = 'tinyurl/index.html'
     context_object_name = 'most_frequently_used'
 
     # set of all MyUrls sorted by number of uses
     def get_queryset(self):
-        return MyUrl.objects.order_by('-num_of_uses')
+        return get_most_frequently_used()
+
+
+def index(request):
+    return render(request, 'tinyurl/index.html', {'most_frequently_used':  get_most_frequently_used()})
+
+
+def delete(request):
+    try:
+        deleted_id = request.POST['deleted_my_url']
+    except KeyError:
+        return render(request, 'tinyurl/index.html', {
+            'most_frequently_used': get_most_frequently_used(),
+            'error_message': "You haven't selected anything to delete"
+        })
+    else:
+        try:
+            MyUrl.objects.filter(id=deleted_id)
+        except MyUrl.DoesNotExist:
+            return render(request, 'tinyurl/index.html', {
+                'most_frequently_used': get_most_frequently_used(),
+                'error_message': "You haven't selected anything to delete"
+            })
+        else:
+            MyUrl.objects.filter(id=deleted_id).delete()
+            return render(request, 'tinyurl/index.html', {
+                'most_frequently_used':  get_most_frequently_used(),
+                'success_message': 'Tiny URL has been deleted successfully'
+            })
 
 
 class DetailView(generic.DetailView):
@@ -36,7 +68,6 @@ def create(request):
             return render(request, 'tinyurl/create.html', {
                 'error_message': "You didn't give me any url ;("
             })
-
         else:
             # find this original url in DB
             duplicate_url = MyUrl.objects.filter(original_url=original_url).first()
@@ -52,7 +83,7 @@ def create(request):
                 # save the changes in DB
                 my_url.save()
                 # redirect to the detail page
-                return HttpResponseRedirect(reverse('tinyurl:detail', args=(my_url.id,)))
+                return redirect(reverse('tinyurl:detail', args=(my_url.id,)))
 
 
 # redirects to the original url from the tiny url
@@ -68,4 +99,4 @@ def tiny_url(request, my_hash):
         my_url.last_us_date = timezone.now()
         # save the changes in DB
         my_url.save()
-        return HttpResponseRedirect(my_url.original_url)
+        return redirect(my_url.original_url, permanent=True)

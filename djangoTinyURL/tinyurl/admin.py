@@ -5,7 +5,7 @@ from .models import MyUrl
 
 
 class TinyUrlAdmin(admin.ModelAdmin):
-    list_display = ('original_url', 'tiny_url', 'num_of_uses')
+    list_display = ('original_url', 'hash', 'num_of_uses')
     search_fields = ['original_url']
     list_filter = ['num_of_uses']
 

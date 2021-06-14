@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from .models import MyUrl
+from .hash import get_tiny_url
 
 
 class MyUrlTests(TestCase):
@@ -13,17 +14,17 @@ class MyUrlTests(TestCase):
         :return:
         """
         my_url = MyUrl(tiny_url='text')
-        self.assertIs(f"{my_url}", my_url.tiny_url)
+        self.assertIs(f"{my_url}", my_url.original_url)
 
 
-def create_tiny_url(tiny_url_text, num_of_uses=0):
+def create_tiny_url(original_url, num_of_uses=0):
     """
     Create a MyUrl with the given 'tiny_url_text' and 'num_of_uses'
-    :param tiny_url_text: text of url
+    :param original_url: original url
     :param num_of_uses: the number of times the tiny url was used
     :return: created MyUrl
     """
-    return MyUrl.objects.create(original_url=tiny_url_text, tiny_url=tiny_url_text,
+    return MyUrl.objects.create(original_url=original_url, tiny_url=get_tiny_url(original_url),
                                 pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=num_of_uses)
 
 
@@ -42,7 +43,7 @@ class IndexViewTest(TestCase):
         """
         Tiny url are displayed on the index page.
         """
-        create_tiny_url(tiny_url_text='test_url')
+        create_tiny_url(original_url='test_url')
         response = self.client.get(reverse('tinyurl:index'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
@@ -54,8 +55,8 @@ class IndexViewTest(TestCase):
         """
         The index page may displayed multiple tiny urls.
         """
-        create_tiny_url(tiny_url_text='test_url_1', num_of_uses=1)
-        create_tiny_url(tiny_url_text='test_url_2', num_of_uses=10)
+        create_tiny_url(original_url='test_url_1', num_of_uses=1)
+        create_tiny_url(original_url='test_url_2', num_of_uses=10)
         response = self.client.get(reverse('tinyurl:index'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(

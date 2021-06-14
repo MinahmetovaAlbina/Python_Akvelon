@@ -1,3 +1,4 @@
+from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
@@ -40,4 +41,7 @@ def tiny_url(request, my_hash):
     if my_url is None:
         raise Http404("Page does not exist")
     else:
+        my_url.num_of_uses = F('num_of_uses') + 1
+        my_url.last_us_date = timezone.now()
+        my_url.save()
         return HttpResponseRedirect(my_url.original_url)

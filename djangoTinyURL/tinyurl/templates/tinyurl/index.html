@@ -8,7 +8,7 @@
 </head>
 <body>
     <header><a href="{% url 'tinyurl:index' %}"><h1>Tiny URL</h1></a>
-        <a href="{% url 'tinyurl:create' %}" class="button">Create new tiny url</a>
+        <a href="{% url 'tinyurl:create' %}" class="button" >Create new tiny url</a>
     </header>
     <div class="wholebody">
     {% if error_message %}<p><strong class="error_msg">{{ error_message }}</strong></p>{% endif %}
@@ -29,7 +29,7 @@
                             <td><a href="{% url 'tinyurl:detail' myurl.id %}">{{ myurl.get_tiny_url }}</a></td>
                             <td><div class="p">{{ myurl.num_of_uses }}</div></td>
                             {% csrf_token %}
-                            <td><div class="p"><input type="radio" name="deleted_my_url" id="{{ myurl.id }}" value="{{ myurl.id }}"></div></td>
+                            <td><div class="p"><input type="radio" name="deleted_url_id" id="{{ myurl.id }}" value="{{ myurl.id }}"></div></td>
                         </tr>
                     {% endfor %}
                 </table>

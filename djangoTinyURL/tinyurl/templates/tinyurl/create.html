@@ -13,7 +13,7 @@
     <div class="wholebody">
     {% if error_message %}<p><strong class="error_msg">{{ error_message }}</strong></p>{% endif %}
 
-    <form action="{% url 'tinyurl:create'%}" method="post">
+    <form action="{% url 'tinyurl:create_post'%}" method="post">
         {% csrf_token  %}
         <label>Please input your original url here:</label><br><br>
         <input type="text" name="original_url" onkeydown="this.style.width = ((this.value.length + 0) * 8) + 'px';" class="original_url_input" placeholder="type down your url..."><br>

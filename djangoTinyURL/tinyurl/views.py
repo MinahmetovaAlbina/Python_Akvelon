@@ -22,28 +22,33 @@ class IndexView(generic.ListView):
         return get_most_frequently_used()
 
 
-def index(request):
-    return render(request, 'tinyurl/index.html', {'most_frequently_used':  get_most_frequently_used()})
-
-
 def delete(request):
+    # check if request has deleted_url_id
     try:
-        deleted_id = request.POST['deleted_my_url']
+        deleted_id = request.POST['deleted_url_id']
+    # if request hasn't deleted_url_id
     except KeyError:
+        # go to the Index page with an error message
         return render(request, 'tinyurl/index.html', {
             'most_frequently_used': get_most_frequently_used(),
             'error_message': "You haven't selected anything to delete"
         })
     else:
+        # check if DB has MyUrl with the given id
         try:
             MyUrl.objects.filter(id=deleted_id)
+        # if DB hasn't MyUrl with the given id
         except MyUrl.DoesNotExist:
+            # go to the Index page with an error message
             return render(request, 'tinyurl/index.html', {
                 'most_frequently_used': get_most_frequently_used(),
                 'error_message': "You haven't selected anything to delete"
             })
+        # if DB has MyUrl with the given id
         else:
+            # delete MyUrl with the given id
             MyUrl.objects.filter(id=deleted_id).delete()
+            # go to the Index page with an success message
             return render(request, 'tinyurl/index.html', {
                 'most_frequently_used':  get_most_frequently_used(),
                 'success_message': 'Tiny URL has been deleted successfully'
@@ -55,12 +60,20 @@ class DetailView(generic.DetailView):
     model = MyUrl
 
 
+# for GET method
+# when you click on button to go to create page
 def create(request):
+    return render(request, 'tinyurl/create.html')
+
+
+# for Post method
+# when you click on button to send a form for generating tiny url
+def create_post(request):
     try:
         original_url = request.POST['original_url']
     except KeyError:
         return render(request, 'tinyurl/create.html', {
-                'error_message': "Key error"
+                'error_message': "You didn't give me any url ;("
             })
     else:
         # if the original url is empty

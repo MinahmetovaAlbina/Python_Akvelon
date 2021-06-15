@@ -6,7 +6,7 @@ from django.views import generic
 from django.urls import reverse
 
 from .models import MyUrl
-from .hash import get_hash
+from .hash import get_hash, get_hash_with_hashids
 
 
 def get_most_frequently_used():
@@ -89,8 +89,9 @@ def create_post(request):
                 })
             else:
                 # generate a MyUrl
-                my_url = MyUrl.objects.create(original_url=original_url, hash=get_hash(original_url),
+                my_url = MyUrl.objects.create(original_url=original_url, hash=0,
                                               pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=0)
+                my_url.hash = get_hash_with_hashids(my_url.id)
                 # save the changes in DB
                 my_url.save()
                 # redirect to the detail page
@@ -110,4 +111,4 @@ def tiny_url(request, my_hash):
         my_url.last_us_date = timezone.now()
         # save the changes in DB
         my_url.save()
-        return redirect(my_url.original_url, permanent=True)
+        return redirect(my_url.original_url)

@@ -1,11 +1,10 @@
-from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from .models import MyUrl
-from .hash import get_hash
-from .views import IndexView, get_most_frequently_used
+from .hash import get_hash, get_hash_with_hashids
+from .views import get_most_frequently_used
 
 
 class MyUrlTests(TestCase):
@@ -20,10 +19,6 @@ class MyUrlTests(TestCase):
 
 
 class HashTests(TestCase):
-
-    def test_get_hash(self):
-        text = 'test'
-        self.assertEqual(get_hash(text), f"{text.__hash__()}")
 
     def test_hash_from_one_strings_are_same(self):
         """
@@ -47,6 +42,32 @@ class HashTests(TestCase):
         text1 = 'test'
         text2 = text1 + '4'
         self.assertNotEqual(get_hash(text1), get_hash(text2), 'hash from different string are equal')
+
+    def test_hashids_from_one_id_are_same(self):
+        """
+        hash from one string should be equal
+        """
+        id = 5696332315489
+        self.assertEqual(get_hash_with_hashids(id), get_hash_with_hashids(id),
+                         'hash from one id are different')
+
+    def test_hashids_from_equal_ids_are_equal(self):
+        """
+        hash from equal strings should be equal
+        """
+        id_1 = 56264894848484877777
+        id_2 = id_1
+        self.assertEqual(get_hash_with_hashids(id_1), get_hash_with_hashids(id_2),
+                         'hash from equal ids are different')
+
+    def test_hashids_from_different_ids_are_different(self):
+        """
+        hash from different strings should be different
+        """
+        id_1 = 85236666625878952
+        id_2 = id_1 + 45415618624586322
+        self.assertNotEqual(get_hash_with_hashids(id_1), get_hash_with_hashids(id_2),
+                            'hash from different ids are equal')
 
 
 def create_my_url(original_url, num_of_uses=0):
@@ -204,5 +225,5 @@ class TinyUrlViewTest(TestCase):
         my_url = create_my_url(original_url)
         url = reverse('tinyurl:tiny_url', args=(my_url.hash, ))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, original_url, "the tiny url doesn't redirect to the original url")

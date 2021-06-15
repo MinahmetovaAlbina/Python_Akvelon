@@ -1,10 +1,11 @@
+from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from .models import MyUrl
 from .hash import get_hash
-from .views import IndexView
+from .views import IndexView, get_most_frequently_used
 
 
 class MyUrlTests(TestCase):
@@ -59,7 +60,19 @@ def create_my_url(original_url, num_of_uses=0):
                                 pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=num_of_uses)
 
 
-class IndexViewTest(TestCase):
+class ViewTest(TestCase):
+
+    def test_get_most_frequently_used(self):
+        """
+        get_most_frequently_used() should return MyUrls in right order
+        """
+        create_my_url('url_1', num_of_uses=1)
+        create_my_url('url_2', num_of_uses=100)
+        create_my_url('url_3', num_of_uses=10)
+        self.assertQuerysetEqual(get_most_frequently_used(), ['<MyUrl: url_2>', '<MyUrl: url_3>', '<MyUrl: url_1>'])
+
+
+class IndexViewTests(TestCase):
 
     def test_no_tiny_urls(self):
         """
@@ -96,14 +109,17 @@ class IndexViewTest(TestCase):
         )
 
     def test_right_order_in_queryset(self):
+        """
+        The index page should displayed multiple tiny urls in right order.
+        """
         create_my_url(original_url='test_url_1', num_of_uses=1)
-        create_my_url(original_url='test_url_2', num_of_uses=10)
-        create_my_url(original_url='test_url_3', num_of_uses=100)
+        create_my_url(original_url='test_url_2', num_of_uses=100)
+        create_my_url(original_url='test_url_3', num_of_uses=10)
         response = self.client.get(reverse('tinyurl:index'))
         self.assertEqual(response.status_code, 200)
         self.assertQuerysetEqual(
             response.context['most_frequently_used'],
-            ['<MyUrl: test_url_3>', '<MyUrl: test_url_2>', '<MyUrl: test_url_1>']
+            ['<MyUrl: test_url_2>', '<MyUrl: test_url_3>', '<MyUrl: test_url_1>']
         )
 
 
@@ -127,6 +143,55 @@ class CreateViewTests(TestCase):
         url = reverse('tinyurl:create')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create new tiny url')
+
+
+class CreatePostViewTests(TestCase):
+
+    def test_some(self):
+        text = 'test_url'
+        url = reverse('tinyurl:create_post', )
+        response = self.client.post(url, {'original_url': text})
+        self.assertEqual(response.status_code, 302)
+
+
+class DeleteViewTests(TestCase):
+
+    def test_delete_only_url(self):
+        """
+        Delete only MyUrl
+        """
+        create_my_url('test_url')
+        url = reverse('tinyurl:delete', )
+        response = self.client.post(url, {'deleted_url_id': 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Tiny URL has been deleted successfully.')
+        self.assertContains(response, 'No tiny url has been added.')
+
+    def test_delete_one_of_two_urls(self):
+        """
+        Delete one MyUrl
+        """
+        create_my_url('test_url_1')
+        create_my_url('test_url_2')
+        url = reverse('tinyurl:delete', )
+        response = self.client.post(url, {'deleted_url_id': 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Tiny URL has been deleted successfully.')
+        self.assertQuerysetEqual(
+            response.context['most_frequently_used'],
+            ['<MyUrl: test_url_2>']
+        )
+
+    def test_delete_doesnt_existing_url(self):
+        s = create_my_url('test_url')
+        url = reverse('tinyurl:delete', )
+        response = self.client.post(url, {'deleted_url_id': 3})
+        a = response.status_code
+        self.assertEqual(a, 200)
+        self.assertQuerysetEqual(
+            response.context['most_frequently_used'],
+            ['<MyUrl: test_url>'])
 
 
 class TinyUrlViewTest(TestCase):

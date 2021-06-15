@@ -31,18 +31,16 @@ def delete(request):
         # go to the Index page with an error message
         return render(request, 'tinyurl/index.html', {
             'most_frequently_used': get_most_frequently_used(),
-            'error_message': "You haven't selected anything to delete"
+            'error_message': "You haven't selected anything to delete."
         })
     else:
         # check if DB has MyUrl with the given id
-        try:
-            MyUrl.objects.filter(id=deleted_id)
+        deleted_my_url = MyUrl.objects.filter(id=deleted_id).first()
         # if DB hasn't MyUrl with the given id
-        except MyUrl.DoesNotExist:
-            # go to the Index page with an error message
+        if deleted_my_url is None or deleted_my_url is []:
             return render(request, 'tinyurl/index.html', {
                 'most_frequently_used': get_most_frequently_used(),
-                'error_message': "You haven't selected anything to delete"
+                'error_message': "You haven't selected anything to delete."
             })
         # if DB has MyUrl with the given id
         else:
@@ -51,7 +49,7 @@ def delete(request):
             # go to the Index page with an success message
             return render(request, 'tinyurl/index.html', {
                 'most_frequently_used':  get_most_frequently_used(),
-                'success_message': 'Tiny URL has been deleted successfully'
+                'success_message': 'Tiny URL has been deleted successfully.'
             })
 
 
@@ -87,7 +85,7 @@ def create_post(request):
             # if MyUrl with this original_url already exists
             if duplicate_url is not None:
                 return render(request, 'tinyurl/create.html', {
-                    'error_message': "I already made a tiny url for this one"
+                    'error_message': "I already made a tiny url for this one."
                 })
             else:
                 # generate a MyUrl
@@ -104,7 +102,7 @@ def tiny_url(request, my_hash):
     my_url = MyUrl.objects.filter(hash=my_hash).first()
     # if MyUrl with the given hash doesn't exist
     if my_url is None:
-        raise Http404("Page does not exist")
+        raise Http404("Page does not exist.")
     else:
         # increase number of uses
         my_url.num_of_uses = F('num_of_uses') + 1

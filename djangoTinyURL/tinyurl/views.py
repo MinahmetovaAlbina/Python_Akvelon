@@ -91,6 +91,7 @@ def create_post(request):
                 # generate a MyUrl
                 my_url = MyUrl.objects.create(original_url=original_url, hash=0,
                                               pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=0)
+                # generate a hash for my_url
                 my_url.hash = get_hash_with_hashids(my_url.id)
                 # save the changes in DB
                 my_url.save()

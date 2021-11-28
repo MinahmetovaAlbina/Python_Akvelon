@@ -77,8 +77,11 @@ def create_my_url(original_url, num_of_uses=0):
     :param num_of_uses: the number of times the tiny url was used
     :return: created MyUrl
     """
-    return MyUrl.objects.create(original_url=original_url, hash=get_hash(original_url),
-                                pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=num_of_uses)
+    my_url = MyUrl.objects.create(original_url=original_url, hash=0,
+                                  pub_date=timezone.now(), last_us_date=timezone.now(), num_of_uses=num_of_uses)
+    my_url.hash = get_hash_with_hashids(my_url.id)
+    my_url.save()
+    return my_url
 
 
 class ViewTest(TestCase):
@@ -169,11 +172,51 @@ class CreateViewTests(TestCase):
 
 class CreatePostViewTests(TestCase):
 
-    def test_some(self):
+    def test_right_create(self):
+        """
+        Create a tiny_url and right redirect on its detail page
+        """
         text = 'test_url'
         url = reverse('tinyurl:create_post', )
         response = self.client.post(url, {'original_url': text})
+        url_detail = reverse('tinyurl:detail', args=(1, ))
         self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, url_detail)
+
+    def test_create_already_existing_url(self):
+        """
+        If tiny url for this original url already exists, new tiny url don't created
+        and appropriate message are displayed
+        """
+        my_url = create_my_url('test_url')
+        url = reverse('tinyurl:create_post', )
+        response = self.client.post(url, {'original_url': my_url.original_url})
+        self.assertEqual(MyUrl.objects.count(), 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create new tiny url')
+        self.assertEqual(response.context['error_message'], 'I already made a tiny url for this one.')
+
+    def test_create_with_no_url(self):
+        """
+        If trying create a tiny_url for no url, new tiny url don't created
+        and appropriate message are displayed
+        """
+        url = reverse('tinyurl:create_post', )
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create new tiny url')
+        self.assertEqual(response.context['error_message'], "You didn't give me any url ;(")
+
+    def test_create_with_empty_url(self):
+        """
+        If trying create a tiny_url for empty url, new tiny url don't created
+        and appropriate message are displayed
+        """
+        url = reverse('tinyurl:create_post', )
+        response = self.client.post(url, {'original_url': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create new tiny url')
+        self.assertEqual(response.context['error_message'], "You didn't give me any url ;(")
 
 
 class DeleteViewTests(TestCase):
@@ -204,26 +247,37 @@ class DeleteViewTests(TestCase):
             ['<MyUrl: test_url_2>']
         )
 
-    def test_delete_doesnt_existing_url(self):
-        s = create_my_url('test_url')
+    def test_delete_without_choice(self):
+        """
+        If no MyUrl has been selected for deleting, view should displayed appropriated error message
+        """
+        my_url = create_my_url('test_url')
         url = reverse('tinyurl:delete', )
-        response = self.client.post(url, {'deleted_url_id': 3})
-        a = response.status_code
-        self.assertEqual(a, 200)
-        self.assertQuerysetEqual(
-            response.context['most_frequently_used'],
-            ['<MyUrl: test_url>'])
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['most_frequently_used'], ['<MyUrl: test_url>'])
+        self.assertEqual(response.context['error_message'], "You haven't selected anything to delete.")
 
 
 class TinyUrlViewTest(TestCase):
 
     def test_tiny_url_redirect_right(self):
         """
-        tiny url redirects on original url
+        tiny url redirects on original url and increase number of its uses
         """
         original_url = 'https://duckduckgo.com'
         my_url = create_my_url(original_url)
         url = reverse('tinyurl:tiny_url', args=(my_url.hash, ))
         response = self.client.get(url)
+        updated_mu_url = MyUrl.objects.get(pk=my_url.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, original_url, "the tiny url doesn't redirect to the original url")
+        self.assertEqual(updated_mu_url.num_of_uses, 1)
+
+    def test_tiny_url_with_wrong_url(self):
+        """
+        Trying redirect on wrong hash returns a 404 not found.
+        """
+        url = reverse('tinyurl:tiny_url', args=(1, ))
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
